@@ -1,126 +1,143 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Gerenciador • Login</title>
-  <style>
-    :root{
-      --bg:#0b1320; --card:#121b2e; --muted:#7b8aa1; --text:#eaf1ff;
-      --primary:#4c8dff; --success:#19c37d; --danger:#ff6b6b;
-      --shadow:0 18px 40px rgba(0,0,0,.35);
-    }
-    body{
-      margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      background:linear-gradient(180deg,#0b1320 0%, #0d1528 100%); color:var(--text);
-      display:flex; align-items:center; justify-content:center; height:100vh; padding:24px;
-    }
-    .wrap{width:100%; max-width:560px}
-    .row-top{display:flex; gap:10px; justify-content:flex-end; margin-bottom:14px}
-    .btn{
-      border:0; border-radius:12px; padding:10px 14px;
-      background:#1a2340; color:#dfe8ff; cursor:pointer; box-shadow:var(--shadow);
-      display:inline-flex; align-items:center; gap:8px; font-weight:600;
-    }
-    .btn-primary{background:var(--primary)}
-    .card{
-      background:var(--card); border:1px solid rgba(255,255,255,.06);
-      border-radius:18px; padding:26px; box-shadow:var(--shadow);
-    }
-    h1{margin:0 0 10px; font-size:28px; display:flex; gap:10px; align-items:center}
-    .muted{color:var(--muted); font-size:14px}
-    .fld{display:flex; flex-direction:column; gap:6px; margin-top:14px; position:relative}
-    .fld input{
-      background:#0f1729; color:var(--text); border:1px solid rgba(255,255,255,.08);
-      border-radius:12px; padding:12px 14px; font-size:16px; outline:none; width:100%;
-    }
-    .row{display:flex; gap:10px; margin-top:16px}
-    .row .btn{flex:1}
-    .ok{color:var(--success)} .err{color:var(--danger)}
-    .eye{position:absolute; right:10px; top:36px; cursor:pointer; user-select:none}
-    .progress{height:4px; width:100%; background:#0f1729; border-radius:999px; overflow:hidden; margin:14px 0 4px; display:none}
-    .bar{height:100%; width:0%; background:linear-gradient(90deg,#63a4ff,#4c8dff); transition:width .2s}
-    .util{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px}
-    .chk{display:flex; align-items:center; gap:8px; font-size:14px; color:var(--muted)}
-    .ver{margin-top:8px; color:#8aa4ff; font-size:12px}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Gerenciador • Login</title>
+<style>
+:root{
+  --bg:#0b1320; --card:#121b2e; --muted:#7b8aa1; --text:#eaf1ff;
+  --primary:#4c8dff; --danger:#ff6b6b; --ok:#19c37d; --shadow:0 18px 40px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box} html,body{height:100%}
+body{
+  margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  background:linear-gradient(180deg,#0b1320 0%, #0d1528 100%); color:var(--text);
+  display:flex; align-items:center; justify-content:center; padding:24px;
+}
+.wrap{width:100%; max-width:620px}
+.row-top{display:flex; gap:10px; justify-content:flex-end; margin-bottom:14px}
+.btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;background:#1a2340;color:#dfe8ff;cursor:pointer;box-shadow:var(--shadow);display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.btn:hover{filter:brightness(1.06)} .btn-primary{background:var(--primary)}
+.card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:26px;box-shadow:var(--shadow)}
+h1{margin:0 0 10px; font-size:28px; display:flex; gap:10px; align-items:center}
+.muted{color:var(--muted); font-size:14px}
+.fld{display:flex; flex-direction:column; gap:6px; margin-top:14px}
+.fld input{
+  background:#0f1729; color:var(--text); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px 14px; font-size:16px; outline:none
+}
+.row{display:flex; gap:10px; margin-top:16px; align-items:center; flex-wrap:wrap}
+.row .btn{flex:1}
+.ok{color:var(--ok)} .err{color:var(--danger)}
+.ver{margin-top:8px; color:#8aa4ff; font-size:12px}
+.progress{height:4px;width:100%;background:#0f1729;border-radius:999px;overflow:hidden;margin:14px 0 4px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#63a4ff,#4c8dff);transition:width .2s}
+.inline{display:flex; align-items:center; gap:10px}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="row-top">
-      <button id="btnTheme" class="btn">🌙/🌞</button>
-      <button id="btnReload" class="btn">⟳ Atualizar</button>
-    </div>
-
-    <div class="card">
-      <h1>🛠️ Gerenciador</h1>
-      <div id="conn" class="muted">…</div>
-
-      <div class="fld">
-        <label>Usuário</label>
-        <input id="user" placeholder="admin" autocomplete="username"/>
-      </div>
-      <div class="fld">
-        <label>Senha</label>
-        <input id="pass" type="password" placeholder="••••••" autocomplete="current-password"/>
-        <span id="togglePass" class="eye">👁️</span>
-      </div>
-
-      <div class="util">
-        <label class="chk"><input id="remember" type="checkbox"> Salvar usuário</label>
-        <button id="btnPing" class="btn" style="padding:8px 10px">🔌 Testar conexão</button>
-      </div>
-      <span id="ts" class="muted"></span>
-
-      <div class="row">
-        <button id="btnLogin" class="btn btn-primary">Entrar</button>
-      </div>
-
-      <div class="progress" id="prog"><div class="bar" id="bar"></div></div>
-      <div id="msg" class="muted" style="min-height:22px;margin-top:6px"></div>
-
-      <div class="ver">v1.1.0</div>
-    </div>
+<div class="wrap">
+  <div class="row-top">
+    <button id="btnTheme" class="btn" title="Tema">🌙/🌞</button>
+    <button id="btnReload" class="btn" title="Forçar atualização">⟳ Atualizar</button>
   </div>
 
+  <div class="card">
+    <h1>🛠️ Gerenciador</h1>
+    <div id="conn" class="muted">…</div>
+
+    <div class="fld">
+      <label>Usuário</label>
+      <input id="user" placeholder="admin" autocomplete="username"/>
+    </div>
+
+    <div class="fld">
+      <label class="inline">
+        <span>Senha</span>
+        <button id="btnShow" class="btn" style="padding:6px 10px">👁️</button>
+      </label>
+      <input id="pass" type="password" placeholder="••••••" autocomplete="current-password"/>
+    </div>
+
+    <div class="row">
+      <label class="inline" style="flex:1 1 100%">
+        <input id="remember" type="checkbox" style="scale:1.2;margin-right:8px"> Salvar usuário
+      </label>
+      <button id="btnPing" class="btn">🛠️ Testar conexão</button>
+    </div>
+
+    <div class="row">
+      <button id="btnLogin" class="btn btn-primary">Entrar</button>
+    </div>
+
+    <div class="progress" style="display:none" id="prog"><div class="bar" id="bar"></div></div>
+    <div id="msg" class="muted" style="min-height:22px;margin-top:6px"></div>
+
+    <div class="ver">v1.1.0</div>
+  </div>
+</div>
+
 <script>
-const API_BASE = "https://script.google.com/macros/s/AKfycbz9QIf4Tr7fdbQ1wD9u_LkeG70B86nLOQmvvfRN0A1oo2WSMb9typ-arkAy5QEp8xnJ/exec";
-const qs=s=>document.querySelector(s);
-const msg=(t,cls="muted")=>{qs("#msg").className=cls;qs("#msg").textContent=t||""};
-const barTo=v=>{qs("#prog").style.display="block";qs("#bar").style.width=(v*100)+"%";if(v>=1)setTimeout(()=>qs("#prog").style.display="none",400)};
-const setConn=(ok,txt)=>qs("#conn").innerHTML=ok?`Conectado • <span class="ok">${txt}</span>`:`<span class="err">${txt}</span>`;
+const API_BASE = '<?= API_BASE ?>'; // URL do próprio Apps Script
+const qs = s=>document.querySelector(s);
+const msg = (t, cls="muted") => { qs("#msg").className=cls; qs("#msg").textContent=t||""; };
+const setConn = (ok, txt) => qs("#conn").innerHTML = ok ? `Conectado • <span class="ok">${txt}</span>` : `<span class="err">${txt}</span>`;
+const prog = (v)=>{ qs("#prog").style.display="block"; qs("#bar").style.width = (v*100).toFixed(0)+"%"; if(v>=1) setTimeout(()=>qs("#prog").style.display="none",350); };
 
-qs("#btnReload").onclick=()=>location.reload();
-qs("#togglePass").onclick=()=>{qs("#pass").type=qs("#pass").type==="password"?"text":"password"};
+(function theme(){
+  const key="mgr_theme";
+  const apply=()=>{ document.documentElement.dataset.theme=localStorage.getItem(key)||"dark"; };
+  apply();
+  qs("#btnTheme").onclick=()=>{ localStorage.setItem(key, (localStorage.getItem(key)==="dark"?"light":"dark")); apply(); };
+})();
+qs("#btnReload").onclick=()=>{ location.href = location.pathname + "?v=" + Date.now(); };
+qs("#btnShow").onclick=()=>{ const p=qs('#pass'); p.type = (p.type==='password'?'text':'password'); };
 
-async function apiPost(path,data){
-  const r=await fetch(API_BASE+"?path="+encodeURIComponent(path),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data||{})});
-  if(!r.ok) throw new Error("HTTP "+r.status); return await r.json();
+(function remember(){
+  const u = localStorage.getItem('mgr_user') || '';
+  if(u){ qs('#user').value=u; qs('#remember').checked=true; }
+})();
+
+async function apiPost(path, data){
+  const r = await fetch(API_BASE + "?path=" + encodeURIComponent(path), {
+    method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" },
+    body: JSON.stringify(data||{}),
+  });
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return await r.json();
 }
 
-// lembrar usuário
-(function(){const s=localStorage.getItem("mgr_user");if(s){qs("#user").value=s;qs("#remember").checked=true}})();
-qs("#remember").addEventListener("change",e=>{const u=qs("#user").value.trim();if(e.target.checked&&u)localStorage.setItem("mgr_user",u);if(!e.target.checked)localStorage.removeItem("mgr_user")});
-qs("#user").addEventListener("input",()=>{if(qs("#remember").checked){const u=qs("#user").value.trim();if(u)localStorage.setItem("mgr_user",u)}});
-
-// ping
-(async()=>{try{await apiPost("/ping",{});setConn(true,new Date().toLocaleString());qs("#ts").textContent=new Date().toLocaleString()}catch(e){setConn(false,"Falha ao conectar")}})();
-qs("#btnPing").onclick=async()=>{try{barTo(.3);await apiPost("/ping",{});barTo(1);msg("Conexão OK ✓","ok");}catch(e){barTo(1);msg("Falha ao conectar","err")}};
-
-// login
-async function doLogin(){
-  const usuario=qs("#user").value.trim(); const senha=qs("#pass").value.trim();
-  if(!senha){msg("Informe a senha","err");return;}
+(async()=>{
   try{
-    barTo(.4); const r=await apiPost("/login",{usuario,senha}); barTo(.9);
-    if(r.error){barTo(1);msg(r.error,"err");return;}
-    localStorage.setItem("mgr_session",JSON.stringify(r.session));
-    msg("Login OK, redirecionando…","ok"); barTo(1);
-    location.href="manager.html?v="+Date.now();
-  }catch(e){barTo(1);msg("Erro: "+e.message,"err")}
-}
-qs("#btnLogin").onclick=doLogin;
-document.addEventListener("keydown",ev=>{if(ev.key==="Enter")doLogin()});
+    await apiPost("/ping",{});
+    setConn(true, new Date().toLocaleString());
+  }catch{
+    setConn(false,"Falha ao conectar");
+  }
+})();
+
+qs("#btnPing").onclick = async ()=>{
+  try{ prog(.2); await apiPost("/ping",{}); prog(1); msg("Conexão OK ✓","ok"); }
+  catch{ prog(1); msg("Falha ao conectar","err"); }
+};
+
+qs("#btnLogin").onclick = async ()=>{
+  const usuario = qs("#user").value.trim() || "admin";
+  const senha   = qs("#pass").value.trim();
+  if(!senha){ msg("Informe a senha","err"); return; }
+  try{
+    prog(.2);
+    const r = await apiPost("/login",{usuario,senha});
+    prog(.6);
+    if(r.error){ prog(1); msg(r.error,"err"); return; }
+    if(qs("#remember").checked) localStorage.setItem('mgr_user', usuario); else localStorage.removeItem('mgr_user');
+    localStorage.setItem("mgr_session", JSON.stringify(r.session));
+    prog(1); msg("Login OK. Indo para o painel…","ok");
+    location.href = API_BASE + "?view=manager&v="+Date.now();
+  }catch(e){
+    prog(1); msg("Erro: "+e.message,"err");
+  }
+};
 </script>
 </body>
 </html>
