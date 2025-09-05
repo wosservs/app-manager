@@ -1,310 +1,93 @@
 <!doctype html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Gerenciador do App</title>
+<title>Gerenciador • Painel</title>
 <style>
 :root{
-  --bg:#0f172a; --card:#0b1220; --text:#e5e7eb; --muted:#9aa4b2; --line:#1f2937;
-  --primary:#3b82f6; --ok:#16a34a; --danger:#ef4444; --chip:#111827;
+  --bg:#0f172a; --card:#0b1220; --text:#e5e7eb; --muted:#94a3b8; --primary:#2563eb;
+  --line:#1f2937; --ok:#16a34a; --danger:#ef4444;
 }
 *{box-sizing:border-box} html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto}
-header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto}
+header{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--line);display:flex;gap:14px;align-items:center;justify-content:space-between;padding:12px 18px;z-index:10}
+nav a{color:var(--text);text-decoration:none;padding:10px 14px;border-radius:999px;background:#111827;border:1px solid var(--line)}
+nav{display:flex;gap:8px;flex-wrap:wrap}
 .container{max-width:1100px;margin:18px auto;padding:0 16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
-h1{margin:0;font-size:18px}
-.muted{color:var(--muted)}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.fld{display:flex;flex-direction:column;gap:6px}
-input,select{background:transparent;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+h2{margin:0 0 12px}
 .btn{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:600}
 .btn-primary{background:var(--primary);color:#fff}
-.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
-.btn-ok{background:var(--ok);color:#fff}
-.btn-danger{background:var(--danger);color:#fff}
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{border-bottom:1px solid var(--line);padding:10px;vertical-align:middle}
-.badge{padding:4px 8px;border-radius:999px;background:var(--chip);border:1px solid var(--line)}
-.right{margin-left:auto}
-.topbar{position:fixed;inset:0 0 auto 0;height:3px;z-index:20}
-.bar{height:100%;width:0;background:linear-gradient(90deg,#60a5fa,#3b82f6);transition:width .2s linear}
-.hidden{display:none}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.muted{color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;background:#111827;border:1px solid var(--line);color:#cbd5e1}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.msg{margin-top:10px;padding:10px;border-radius:10px}
+.ok{background:#064e3b;color:#a7f3d0} .err{background:#7f1d1d;color:#fecaca}
 </style>
 </head>
 <body>
-<div class="topbar"><div id="bar" class="bar"></div></div>
-
 <header>
   <div class="row">
-    <strong>🛠️ Gerenciador do App</strong>
-    <span id="who" class="badge muted"></span>
+    <strong>🛠️ Gerenciador</strong>
+    <span id="who" class="badge">…</span>
   </div>
-  <div class="row">
-    <button id="btnLogout" class="btn btn-ghost hidden">Sair</button>
-  </div>
+  <nav class="row">
+    <a href="#" id="btnRefresh">Atualizar</a>
+    <a href="#" id="btnLogout" class="btn-ghost">Sair</a>
+  </nav>
 </header>
 
 <div class="container">
-
-  <!-- LOGIN -->
-  <div id="boxLogin" class="card">
-    <h1>Login do gerente</h1>
-    <div class="row" style="margin-top:12px">
-      <div class="fld" style="flex:1">
-        <label class="muted">Usuário (e-mail)</label>
-        <input id="lgUser" placeholder="voce@empresa.com">
-      </div>
-      <div class="fld" style="flex:1">
-        <label class="muted">Senha</label>
-        <input id="lgPass" type="password" placeholder="•••••••">
-      </div>
-      <button id="btnLogin" class="btn btn-primary">Entrar</button>
-    </div>
-    <div id="lgMsg" class="muted" style="margin-top:8px"></div>
+  <div class="card">
+    <h2>Bem-vindo</h2>
+    <p class="muted">Aqui você vai gerenciar o acesso do app <b>jr-app</b>, permissões, bloqueios e clientes.</p>
+    <div id="msg" class="msg" style="display:none"></div>
   </div>
 
-  <!-- DASHBOARD -->
-  <div id="boxDash" class="card hidden">
-    <div class="row" style="margin-bottom:10px">
-      <h1>Empresas / Usuários</h1>
-      <button id="btnReload" class="btn btn-ghost right">Atualizar</button>
-      <button id="btnNew" class="btn btn-ok">+ Novo registro</button>
-    </div>
-
-    <div class="row" style="margin-bottom:12px">
-      <input id="q" placeholder="Buscar por empresa, responsável, telefone…" style="flex:2">
-      <select id="fltStatus" style="flex:1">
-        <option value="">Todos os status</option>
-        <option value="ATIVO">ATIVO</option>
-        <option value="BLOQUEADO">BLOQUEADO</option>
-      </select>
-      <select id="fltPlano" style="flex:1">
-        <option value="">Todos os planos</option>
-        <option>FREE</option><option>BASIC</option><option>PRO</option>
-      </select>
-    </div>
-
-    <div class="card">
-      <table class="table" id="tbl">
-        <thead>
-          <tr>
-            <th>Empresa</th>
-            <th>Responsável</th>
-            <th>Telefone</th>
-            <th>Plano</th>
-            <th>Status</th>
-            <th>Módulos</th>
-            <th style="width:260px">Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
+  <div class="card" style="margin-top:14px">
+    <h2>Aplicativos cadastrados</h2>
+    <div id="apps" class="muted">Carregando…</div>
   </div>
-
-  <!-- MODAL NOVO/EDIT -->
-  <div id="modal" class="card hidden" style="margin-top:14px">
-    <h1 id="mTitle">Novo registro</h1>
-    <div class="row" style="margin-top:10px">
-      <div class="fld" style="flex:2">
-        <label class="muted">Empresa *</label>
-        <input id="mEmpresa">
-      </div>
-      <div class="fld" style="flex:1">
-        <label class="muted">Plano</label>
-        <select id="mPlano"><option>FREE</option><option>BASIC</option><option>PRO</option></select>
-      </div>
-      <div class="fld" style="flex:1">
-        <label class="muted">Status</label>
-        <select id="mStatus"><option>ATIVO</option><option>BLOQUEADO</option></select>
-      </div>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <div class="fld" style="flex:1">
-        <label class="muted">Responsável *</label>
-        <input id="mNome">
-      </div>
-      <div class="fld" style="flex:1">
-        <label class="muted">Telefone (WhatsApp) *</label>
-        <input id="mTel" placeholder="(85) 98888-7777">
-      </div>
-      <div class="fld" style="flex:1">
-        <label class="muted">E-mail (login do app)</label>
-        <input id="mEmail" placeholder="contato@empresa.com">
-      </div>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <label class="muted">Módulos:</label>
-      <label><input type="checkbox" id="mModRom" checked> Romaneios</label>
-      <label><input type="checkbox" id="mModCli" checked> Clientes</label>
-      <label><input type="checkbox" id="mModUsr" checked> Usuários</label>
-    </div>
-    <div class="row" style="margin-top:12px">
-      <button id="mSave" class="btn btn-primary">Salvar</button>
-      <button id="mClose" class="btn btn-ghost">Cancelar</button>
-      <div id="mMsg" class="muted"></div>
-    </div>
-  </div>
-
 </div>
 
 <script>
-/* ====== CONFIG ====== */
-const MG_API = "https://script.google.com/macros/s/AKfycbz9QIf4Tr7fdbQ1wD9u_LkeG70B86nLOQmvvfRN0A1oo2WSMb9typ-arkAy5QEp8xnJ/exec";
-
-/* ====== Helpers ====== */
-const qs = s => document.querySelector(s);
-const bar = qs('#bar');
-function barStart(){ bar.style.width='20%'; let w=20; window._b=setInterval(()=>{ w=Math.min(95,w+5); bar.style.width=w+'%' },180) }
-function barDone(){ clearInterval(window._b); bar.style.width='100%'; setTimeout(()=>bar.style.width='0',260) }
-
-const sess = (()=>{ try{ return JSON.parse(localStorage.getItem('mgr_sess')||'{}') }catch(_){ return {} } })();
-function setLoginUI(){
-  const logged = !!sess.token;
-  qs('#boxLogin').classList.toggle('hidden', logged);
-  qs('#boxDash').classList.toggle('hidden', !logged);
-  qs('#btnLogout').classList.toggle('hidden', !logged);
-  qs('#who').textContent = logged ? (sess.user||'') : '';
+const API_BASE = '<?= API_BASE ?>';
+function show(kind, text){
+  const el = document.getElementById('msg');
+  el.className = 'msg '+(kind==='err'?'err':'ok');
+  el.textContent = text;
+  el.style.display = 'block';
 }
-
-async function api(path, body={}){
-  barStart();
-  const r = await fetch(MG_API+"?path="+encodeURIComponent(path), {
+async function post(path, body={}){
+  const r = await fetch(API_BASE+"?path="+encodeURIComponent(path), {
     method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body: JSON.stringify({...body, token:sess.token||''})
+    body: JSON.stringify(body)
   });
-  barDone();
-  if(!r.ok) throw new Error('HTTP '+r.status);
   return r.json();
 }
+const sess = (function(){ try{return JSON.parse(localStorage.getItem('mgr_session')||'{}')}catch(_){return{}} })();
+if(!sess.token){ location.href = API_BASE + '?view=index'; }
 
-/* ====== Login ====== */
-qs('#btnLogin').onclick = async ()=>{
-  qs('#lgMsg').textContent='';
-  const u = qs('#lgUser').value.trim();
-  const p = qs('#lgPass').value.trim();
-  if(!u||!p){ qs('#lgMsg').textContent='Informe usuário e senha.'; return }
-  try{
-    const resp = await api('/mgr/login',{user:u,pass:p});
-    if(resp.error){ qs('#lgMsg').textContent = resp.error; return }
-    localStorage.setItem('mgr_sess', JSON.stringify(resp.session||{}));
-    Object.assign(sess, resp.session||{});
-    setLoginUI(); loadList();
-  }catch(e){ qs('#lgMsg').textContent = 'Falha: '+e.message }
+document.getElementById('btnLogout').onclick = async (e)=>{
+  e.preventDefault();
+  try{ await post('/logout',{token:sess.token}); }catch(_){}
+  localStorage.removeItem('mgr_session');
+  location.href = API_BASE + '?view=index';
 };
-qs('#btnLogout').onclick = async ()=>{
-  try{ await api('/mgr/logout',{}); }catch(_){}
-  localStorage.removeItem('mgr_sess'); location.reload();
-};
-setLoginUI();
+document.getElementById('btnRefresh').onclick = ()=> location.reload(true);
 
-/* ====== Lista ====== */
-let RAW=[];
-async function loadList(){
-  try{
-    const r = await api('/mgr/tenants/list',{});
-    RAW = r.items||[];
-    render();
-  }catch(e){ alert('Falha ao carregar: '+e.message) }
-}
-function render(){
-  const q = qs('#q').value.toLowerCase();
-  const st = qs('#fltStatus').value;
-  const pl = qs('#fltPlano').value;
-  const tb = qs('#tbody'); tb.innerHTML='';
-  RAW.filter(x=>{
-    const okQ = !q || (x.empresa+x.nome+x.tel).toLowerCase().includes(q);
-    const okS = !st || x.status===st;
-    const okP = !pl || x.plano===pl;
-    return okQ && okS && okP;
-  }).forEach(x=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${x.empresa||'-'}</td>
-      <td>${x.nome||'-'}</td>
-      <td>${x.tel||'-'}</td>
-      <td><span class="badge">${x.plano||'FREE'}</span></td>
-      <td><span class="badge">${x.status||'ATIVO'}</span></td>
-      <td><span class="badge">${(x.mods||[]).join(', ')||'-'}</span></td>
-      <td>
-        <button class="btn btn-ghost" data-act="edit">Editar</button>
-        <button class="btn ${x.status==='ATIVO'?'btn-danger':'btn-ok'}" data-act="toggle">
-          ${x.status==='ATIVO'?'Bloquear':'Reativar'}
-        </button>
-        <button class="btn btn-ghost" data-act="reset">Resetar senha</button>
-      </td>`;
-    tr.querySelector('[data-act="edit"]').onclick = ()=> openModal(x);
-    tr.querySelector('[data-act="toggle"]').onclick = ()=> toggle(x);
-    tr.querySelector('[data-act="reset"]').onclick = ()=> resetPwd(x);
-    tb.appendChild(tr);
-  });
-}
-qs('#btnReload').onclick = loadList;
-qs('#q').oninput = render;
-qs('#fltStatus').onchange = render;
-qs('#fltPlano').onchange = render;
+(async()=>{
+  const me = await post('/me',{token:sess.token});
+  if(me?.error){ show('err','Sessão inválida — faça login novamente.'); setTimeout(()=>location.href=API_BASE+'?view=index',1200); return; }
+  document.getElementById('who').textContent = me.me;
 
-/* ====== Novo/Editar ====== */
-let EDIT=null;
-function openModal(row){
-  EDIT = row||null;
-  qs('#mTitle').textContent = EDIT ? 'Editar registro' : 'Novo registro';
-  qs('#mEmpresa').value = EDIT?.empresa||'';
-  qs('#mPlano').value   = EDIT?.plano||'FREE';
-  qs('#mStatus').value  = EDIT?.status||'ATIVO';
-  qs('#mNome').value    = EDIT?.nome||'';
-  qs('#mTel').value     = EDIT?.tel||'';
-  qs('#mEmail').value   = EDIT?.email||'';
-  qs('#mModRom').checked= (EDIT?.mods||[]).includes('ROMANEIOS');
-  qs('#mModCli').checked= (EDIT?.mods||[]).includes('CLIENTES');
-  qs('#mModUsr').checked= (EDIT?.mods||[]).includes('USUARIOS');
-  qs('#modal').classList.remove('hidden');
-  qs('#mMsg').textContent='';
-}
-qs('#btnNew').onclick = ()=> openModal(null);
-qs('#mClose').onclick = ()=> qs('#modal').classList.add('hidden');
-
-qs('#mSave').onclick = async ()=>{
-  const payload = {
-    id: EDIT?.id||'',
-    empresa: qs('#mEmpresa').value.trim(),
-    plano: qs('#mPlano').value,
-    status: qs('#mStatus').value,
-    nome: qs('#mNome').value.trim(),
-    tel: qs('#mTel').value.trim(),
-    email: qs('#mEmail').value.trim(),
-    mods: [
-      qs('#mModRom').checked?'ROMANEIOS':null,
-      qs('#mModCli').checked?'CLIENTES':null,
-      qs('#mModUsr').checked?'USUARIOS':null,
-    ].filter(Boolean)
-  };
-  if(!payload.empresa || !payload.nome || !payload.tel){
-    qs('#mMsg').textContent = 'Preencha empresa, responsável e telefone.'; return;
-  }
-  try{
-    const r = await api('/mgr/tenants/save', payload);
-    if(r.error){ qs('#mMsg').textContent = r.error; return }
-    qs('#modal').classList.add('hidden');
-    loadList();
-  }catch(e){ qs('#mMsg').textContent='Falha: '+e.message }
-};
-
-async function toggle(x){
-  if(!confirm(`${x.status==='ATIVO'?'Bloquear':'Reativar'} acesso de "${x.empresa}"?`)) return;
-  try{ await api('/mgr/tenants/toggle',{id:x.id, to:x.status==='ATIVO'?'BLOQUEADO':'ATIVO'}); loadList(); }
-  catch(e){ alert('Falha: '+e.message) }
-}
-async function resetPwd(x){
-  if(!confirm(`Gerar nova senha para "${x.nome}" e registrar no AUDIT?`)) return;
-  try{ const r=await api('/mgr/tenants/resetPassword',{id:x.id}); alert(r.msg||'Ok'); }
-  catch(e){ alert('Falha: '+e.message) }
-}
-
-/* auto-load */
-if(sess.token){ loadList(); }
+  const apps = await post('/apps/list',{token:sess.token});
+  if(apps?.error){ document.getElementById('apps').textContent = apps.error; return; }
+  if(!apps.items?.length){ document.getElementById('apps').textContent = 'Nenhum app cadastrado ainda.'; return; }
+  document.getElementById('apps').textContent = JSON.stringify(apps.items, null, 2);
+})();
 </script>
 </body>
 </html>
